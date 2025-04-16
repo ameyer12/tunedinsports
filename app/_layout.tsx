@@ -11,7 +11,7 @@ export default function Layout() {
 
   const handleViewPlaylist = async () => {
     try {
-      const response = await fetch('http://100.110.187.30:3001/api/create-playlist');
+      const response = await fetch('https://tunedinsports.onrender.com/api/create-playlist');
       const data = await response.json(); 
   
       if (data.playlistUrl) {
