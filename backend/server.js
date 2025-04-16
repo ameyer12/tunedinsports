@@ -4,7 +4,7 @@ const axios = require('axios');
 const Sentiment = require('sentiment');
 const Genius = require("genius-lyrics");
 // const config = require('../config');
-const Client = new Genius.Client(config.GENIUS_API_KEY);
+const Client = new Genius.Client(process.env.GENIUS_API_KEY);
 const admin = require('firebase-admin');
 const serviceAccount = require('./service-account-key.json');
 const qs = require('querystring'); 
@@ -32,7 +32,7 @@ app.get('/api/news', async (req, res) => {
       params: {
         category: 'sports',
         country: 'us',
-        apiKey: config.NEWS_API_KEY
+        apiKey: process.env.NEWS_API_KEY
       }
     });
 
@@ -50,7 +50,7 @@ async function getNewsSentiments() {
       params: {
         category: 'sports',
         country: 'us',
-        apiKey: config.NEWS_API_KEY
+        apiKey: process.env.NEWS_API_KEY
       }
     });
 
@@ -113,7 +113,7 @@ async function getSpotifyRecommendations() {
     },
     headers: {
       'x-rapidapi-host': 'spotify23.p.rapidapi.com',
-      'x-rapidapi-key': config.RAPID_API_KEY
+      'x-rapidapi-key': process.env.RAPID_API_KEY
     }
   };
 
@@ -265,9 +265,9 @@ app.get('/api/create-playlist', async (req, res) => {
     }
 
     const refreshAccessToken = async () => {
-      const clientId = config.SPOTIFY_CLIENT_ID;
-      const clientSecret = config.SPOTIFY_CLIENT_SECRET;
-      const refreshToken = config.SPOTIFY_REFRESH_TOKEN;
+      const clientId = process.env.SPOTIFY_CLIENT_ID;
+      const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+      const refreshToken = process.env.SPOTIFY_REFRESH_TOKEN;
     
       const authBuffer = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
     
