@@ -139,15 +139,6 @@ export default function HomeScreen() {
     return () => unsubscribe();
   }, []);
 
-  const exampleMatch = {
-    article: "Cubs Place Justin Steele On Injured List - MLB Trade Rumors",
-    articleLink: "https://www.mlb.com/news/justin-steele-elbow-injury-april-2025#:~:text=Cubs%20place%20Steele%20on%20IL%20with%20elbow%20tendinitis%2C%20MRI%20set%20for%20Thursday&text=CHICAGO%20%2D%2D%20Cubs%20left%2Dhander,Monday%20night%20at%20Wrigley%20Field.",
-    articleImage: "no-image-found.jpg",
-    matchedSong: "Talk Dirty (feat. 2 Chainz)",
-    spotifyLink: "https://open.spotify.com/track/6g6A7qNhTfUgOSH7ROOxTD",
-    songSentiment: 2.5
-  };
-
   return (
     <View style={styles.container}>
       { loading ? (
