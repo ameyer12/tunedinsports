@@ -9,9 +9,6 @@ const qs = require('querystring');
 // const config = require('../config');
 // const serviceAccount = require('./service-account-key.json');
 
-// Initialize Firebase Admin
-const admin = require('firebase-admin');
-
 const serviceAccount = JSON.parse(
   Buffer.from(process.env.FIREBASE_SERVICE_KEY, 'base64').toString('utf8')
 );
