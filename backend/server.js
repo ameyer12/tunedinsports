@@ -3,13 +3,19 @@ const cors = require('cors');
 const axios = require('axios');
 const Sentiment = require('sentiment');
 const Genius = require("genius-lyrics");
-// const config = require('../config');
 const Client = new Genius.Client(process.env.GENIUS_API_KEY);
 const admin = require('firebase-admin');
-const serviceAccount = require('./service-account-key.json');
 const qs = require('querystring'); 
+// const config = require('../config');
+// const serviceAccount = require('./service-account-key.json');
 
 // Initialize Firebase Admin
+const admin = require('firebase-admin');
+
+const serviceAccount = JSON.parse(
+  Buffer.from(process.env.FIREBASE_SERVICE_KEY, 'base64').toString('utf8')
+);
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
