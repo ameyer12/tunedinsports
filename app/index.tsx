@@ -25,7 +25,7 @@ export default function HomeScreen() {
     try {
       setLoading(true);
 
-      const response = await fetch('http://100.110.187.30:3001/api/match-songs');
+      const response = await fetch('https://tunedinsports.onrender.com/api/match-songs');
       const data = await response.json();
 
       setMatches(data);
