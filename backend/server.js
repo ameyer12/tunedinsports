@@ -179,21 +179,35 @@ function sortObjectByNestedValue(obj, nestedKey) {
 
 function generateSentimentMatches(obj1, obj2) {
   let matches = [];
-  let temp_obj2 = Object.assign({}, obj2);
+  let temp_obj2 = { ...obj2 };
   let articles = Object.keys(obj1);
 
-  for(let i = 0; i < articles.length; i++){
+  if (Object.keys(temp_obj2).length === 0) {
+    console.warn("No songs available for matching.");
+    return [];
+  }
+
+  for (let i = 0; i < articles.length; i++) {
     let closestSentiment = Infinity;
-    let chosenTrack = "";
+    let chosenTrack = null;
 
-    for(let j = 0; j < Object.keys(temp_obj2).length; j++){
-      let musicSentimentScore = temp_obj2[Object.keys(temp_obj2)[j]].sentiment;
-      let currSentimentComparison = Math.abs(obj1[articles[i]].sentiment - musicSentimentScore);
+    for (let j = 0; j < Object.keys(temp_obj2).length; j++) {
+      const key = Object.keys(temp_obj2)[j];
+      const musicSentimentScore = temp_obj2[key]?.sentiment;
 
-      if (currSentimentComparison < closestSentiment) {
-        closestSentiment = currSentimentComparison;
-        chosenTrack = Object.keys(temp_obj2)[j];
+      if (musicSentimentScore == null) continue;
+
+      const diff = Math.abs(obj1[articles[i]].sentiment - musicSentimentScore);
+
+      if (diff < closestSentiment) {
+        closestSentiment = diff;
+        chosenTrack = key;
       }
+    }
+
+    if (!chosenTrack || !temp_obj2[chosenTrack]) {
+      console.warn(`Could not find match for article: ${articles[i]}`);
+      continue;
     }
 
     matches.push({
@@ -202,15 +216,16 @@ function generateSentimentMatches(obj1, obj2) {
       articleLink: obj1[articles[i]].url,
       articleImage: obj1[articles[i]].image,
       matchedSong: chosenTrack,
-      songSentiment: temp_obj2[chosenTrack]["sentiment"],
-      spotifyLink: temp_obj2[chosenTrack]["spotifyLink"],
-    })
+      songSentiment: temp_obj2[chosenTrack].sentiment,
+      spotifyLink: temp_obj2[chosenTrack].spotifyLink,
+    });
 
     delete temp_obj2[chosenTrack];
   }
 
   return matches;
 }
+
 
 async function getAllSpotifyRecommendations(batchCount = 3) {
   const recommendationPromises = Array.from({ length: batchCount }, () =>
@@ -237,8 +252,6 @@ app.get('/api/match-songs', async (req, res) => {
     let newsSentiments = await getNewsSentiments();
     let spotifyRecommendations = await getAllSpotifyRecommendations(3);
     let musicSentiments = await getMusicSentiments(spotifyRecommendations);
-
-    console.log("Music sentiments: ", musicSentiments)
 
     newsSentiments = sortObjectByNestedValue(newsSentiments, "sentiment");
     musicSentiments = sortObjectByNestedValue(musicSentiments, "sentiment");
