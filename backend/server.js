@@ -158,8 +158,6 @@ async function getMusicSentiments(recommendations) {
 
   await Promise.all(musicSentimentPromises);
 
-  console.log(musicSentiments)
-
   return musicSentiments;
 }
 
@@ -239,6 +237,8 @@ app.get('/api/match-songs', async (req, res) => {
     let newsSentiments = await getNewsSentiments();
     let spotifyRecommendations = await getAllSpotifyRecommendations(3);
     let musicSentiments = await getMusicSentiments(spotifyRecommendations);
+
+    console.log("Music sentiments: ", musicSentiments)
 
     newsSentiments = sortObjectByNestedValue(newsSentiments, "sentiment");
     musicSentiments = sortObjectByNestedValue(musicSentiments, "sentiment");
