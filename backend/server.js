@@ -182,25 +182,19 @@ function generateSentimentMatches(obj1, obj2) {
   let temp_obj2 = Object.assign({}, obj2);
   let articles = Object.keys(obj1);
 
-  for (let i = 0; i < articles.length; i++) {
+  for(let i = 0; i < articles.length; i++){
     let closestSentiment = Infinity;
     let chosenTrack = "";
 
-    for (let j = 0; j < Object.keys(temp_obj2).length; j++) {
-      let currentTrack = Object.keys(temp_obj2)[j];
-      let musicSentimentScore = temp_obj2[currentTrack]?.sentiment ?? null;
-
-      if (musicSentimentScore === null) continue;
-
+    for(let j = 0; j < Object.keys(temp_obj2).length; j++){
+      let musicSentimentScore = temp_obj2[Object.keys(temp_obj2)[j]].sentiment;
       let currSentimentComparison = Math.abs(obj1[articles[i]].sentiment - musicSentimentScore);
 
       if (currSentimentComparison < closestSentiment) {
         closestSentiment = currSentimentComparison;
-        chosenTrack = currentTrack;
+        chosenTrack = Object.keys(temp_obj2)[j];
       }
     }
-
-    if (!temp_obj2[chosenTrack]) continue; // skip if undefined
 
     matches.push({
       article: articles[i],
@@ -208,16 +202,15 @@ function generateSentimentMatches(obj1, obj2) {
       articleLink: obj1[articles[i]].url,
       articleImage: obj1[articles[i]].image,
       matchedSong: chosenTrack,
-      songSentiment: temp_obj2[chosenTrack].sentiment,
-      spotifyLink: temp_obj2[chosenTrack].spotifyLink,
-    });
+      songSentiment: temp_obj2[chosenTrack]["sentiment"],
+      spotifyLink: temp_obj2[chosenTrack]["spotifyLink"],
+    })
 
     delete temp_obj2[chosenTrack];
   }
 
   return matches;
 }
-
 
 async function getAllSpotifyRecommendations(batchCount = 3) {
   const recommendationPromises = Array.from({ length: batchCount }, () =>
