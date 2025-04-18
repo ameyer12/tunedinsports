@@ -158,6 +158,8 @@ async function getMusicSentiments(recommendations) {
 
   await Promise.all(musicSentimentPromises);
 
+  console.log(musicSentiments)
+
   return musicSentiments;
 }
 
