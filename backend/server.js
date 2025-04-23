@@ -6,6 +6,7 @@ const Genius = require("genius-lyrics");
 const Client = new Genius.Client("OsFdWzPGj0TlUTFJi5M700irhs2xjEa6xN6TrXhfebjtmjjC3KZl27SsMDgz7zjz");
 const admin = require('firebase-admin');
 const qs = require('querystring'); 
+const pLimit = require('p-limit');
 // const config = require('../config');
 // const serviceAccount = require('./service-account-key.json');
 
@@ -132,35 +133,32 @@ async function getSpotifyRecommendations() {
 async function getMusicSentiments(recommendations) {
   const musicSentiments = {};
   const musicSentiment = new Sentiment();
+  const limit = pLimit(5); // max 5 requests in parallel
 
-  const musicSentimentPromises = recommendations.tracks.map(async (track) => {
-    const title = track.name;
-    const spotifyLink = track["external_urls"]["spotify"];
+  const musicSentimentPromises = recommendations.tracks.map((track) => 
+    limit(async () => {
+      const title = track.name;
+      const spotifyLink = track.external_urls.spotify;
 
-    try {
-      const results = await Client.songs.search(title);
-      console.log(`🔍 Genius results for "${title}":`, results?.[0]?.fullTitle);
+      try {
+        const results = await Client.songs.search(title);
+        if (results.length === 0) return;
 
-      if (!results.length) {
-        console.warn(`⚠️ No Genius results for "${title}"`);
-        return;
+        const lyrics = await results[0].lyrics();
+        const sentiment = musicSentiment.analyze(lyrics);
+
+        musicSentiments[title] = {
+          sentiment: sentiment.score,
+          spotifyLink
+        };
+      } catch (err) {
+        console.error(`❌ Genius fetch failed for "${title}":`, err.message || err.response?.data);
       }
+    })
+  );
 
-      const lyrics = await results[0].lyrics();
-      const sentiment = musicSentiment.analyze(lyrics);
+  await Promise.all(musicSentimentPromises);
 
-      musicSentiments[title] = {
-        sentiment: sentiment.score,
-        spotifyLink
-      };
-
-      console.log(`✅ Sentiment stored for "${title}":`, sentiment.score);
-    } catch (error) {
-      console.error(`❌ Genius fetch failed for "${title}":`, error.response?.data || error.message);
-    }
-  });
-
-  await Promise.allSettled(musicSentimentPromises);
 
   return musicSentiments;
 }
