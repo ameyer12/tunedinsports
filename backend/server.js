@@ -249,6 +249,7 @@ app.get('/api/match-songs', async (req, res) => {
     console.log("🔍 /api/match-songs endpoint inside try")
 
     if (existingDoc.exists) {
+      console.log("📄 Returning cached match data");
       return res.json(existingDoc.data().matches);
     }
 
