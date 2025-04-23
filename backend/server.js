@@ -137,31 +137,33 @@ async function getMusicSentiments(recommendations) {
     const title = track.name;
     const spotifyLink = track["external_urls"]["spotify"];
 
-    const results = await Client.songs.search(title);
-    console.log("GENIUS CLIENT RESULTS: ", results)
-    // try {
-    //   const results = await Client.songs.search(title);
+    try {
+      const results = await Client.songs.search(title);
+      console.log(`🔍 Genius results for "${title}":`, results?.[0]?.fullTitle);
 
-    //   if (results.length === 0) return;
+      if (!results.length) {
+        console.warn(`⚠️ No Genius results for "${title}"`);
+        return;
+      }
 
-    //   const lyrics = await results[0].lyrics();
-    //   const sentiment = musicSentiment.analyze(lyrics);
+      const lyrics = await results[0].lyrics();
+      const sentiment = musicSentiment.analyze(lyrics);
 
-    //   musicSentiments[title] = {
-    //     sentiment: sentiment.score,
-    //     spotifyLink
-    //   };
-    // } catch (error) {
-    //   // Gracefully skip failed requests
-    //   console.error(`❌ Genius fetch failed for "${title}":`, error.message || error.response?.data);
-    // }
+      musicSentiments[title] = {
+        sentiment: sentiment.score,
+        spotifyLink
+      };
+
+      console.log(`✅ Sentiment stored for "${title}":`, sentiment.score);
+    } catch (error) {
+      console.error(`❌ Genius fetch failed for "${title}":`, error.response?.data || error.message);
+    }
   });
 
   await Promise.allSettled(musicSentimentPromises);
 
   return musicSentiments;
 }
-
 
 function sortObjectByValue(obj) {
   const entries = Object.entries(obj);
