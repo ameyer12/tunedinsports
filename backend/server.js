@@ -137,22 +137,24 @@ async function getMusicSentiments(recommendations) {
     const title = track.name;
     const spotifyLink = track["external_urls"]["spotify"];
 
-    try {
-      const results = await Client.songs.search(title);
+    const results = await Client.songs.search(title);
+    console.log("GENIUS CLIENT RESULTS: ", results)
+    // try {
+    //   const results = await Client.songs.search(title);
 
-      if (results.length === 0) return;
+    //   if (results.length === 0) return;
 
-      const lyrics = await results[0].lyrics();
-      const sentiment = musicSentiment.analyze(lyrics);
+    //   const lyrics = await results[0].lyrics();
+    //   const sentiment = musicSentiment.analyze(lyrics);
 
-      musicSentiments[title] = {
-        sentiment: sentiment.score,
-        spotifyLink
-      };
-    } catch (error) {
-      // Gracefully skip failed requests
-      console.error(`❌ Genius fetch failed for "${title}":`, error.message || error.response?.data);
-    }
+    //   musicSentiments[title] = {
+    //     sentiment: sentiment.score,
+    //     spotifyLink
+    //   };
+    // } catch (error) {
+    //   // Gracefully skip failed requests
+    //   console.error(`❌ Genius fetch failed for "${title}":`, error.message || error.response?.data);
+    // }
   });
 
   await Promise.allSettled(musicSentimentPromises);
