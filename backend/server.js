@@ -256,6 +256,10 @@ app.get('/api/match-songs', async (req, res) => {
     let spotifyRecommendations = await getAllSpotifyRecommendations(3);
     let musicSentiments = await getMusicSentiments(spotifyRecommendations);
 
+    console.log("newsSentiments: ", newsSentiments)
+    console.log("spotifyRecommendations: ", spotifyRecommendations)
+    console.log("musicSentiments: ", musicSentiments)
+
     newsSentiments = sortObjectByNestedValue(newsSentiments, "sentiment");
     musicSentiments = sortObjectByNestedValue(musicSentiments, "sentiment");
 
