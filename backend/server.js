@@ -138,9 +138,10 @@ async function getMusicSentiments(recommendations) {
     const title = track.name;
     const spotifyLink = track["external_urls"]["spotify"];
 
-    // console.log("Track: ", track)
     try {
       const results = await Client.songs.search(title);
+
+      console.log("get music sentiments results: ", results);
   
       if (results.length === 0) return;
 
@@ -257,6 +258,8 @@ app.get('/api/match-songs', async (req, res) => {
     musicSentiments = sortObjectByNestedValue(musicSentiments, "sentiment");
 
     let sentimentMatches = generateSentimentMatches(newsSentiments, musicSentiments);
+
+    console.log(sentimentMatches);
 
     // Save to Firestore
     await docRef.set({
