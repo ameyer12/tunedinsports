@@ -249,37 +249,19 @@ app.get('/api/match-songs', async (req, res) => {
     console.log("🔍 /api/match-songs endpoint inside try")
 
     if (existingDoc.exists) {
-      console.log("📄 Returning cached match data");
-      return res.json(existingDoc.data().matches);
+      const data = existingDoc.data();
+      if (data.matches && data.matches.length > 0) {
+        console.log("📄 Returning cached match data");
+        return res.json(data.matches);
+      } else {
+        console.warn("⚠️ Cached doc exists but matches are missing or empty — regenerating.");
+        // Let it fall through to regenerate matches
+      }
     }
 
-    // let newsSentiments = await getNewsSentiments();
-    // let spotifyRecommendations = await getAllSpotifyRecommendations(3);
-    // let musicSentiments = await getMusicSentiments(spotifyRecommendations);
-    
-    let newsSentiments, spotifyRecommendations, musicSentiments;
-
-    try {
-      newsSentiments = await getNewsSentiments();
-      console.log("✅ newsSentiments:", newsSentiments);
-    } catch (e) {
-      console.error("❌ Error in getNewsSentiments:", e);
-    }
-    
-    try {
-      spotifyRecommendations = await getAllSpotifyRecommendations(3);
-      console.log("✅ spotifyRecommendations:", spotifyRecommendations);
-    } catch (e) {
-      console.error("❌ Error in getAllSpotifyRecommendations:", e);
-    }
-    
-    try {
-      musicSentiments = await getMusicSentiments(spotifyRecommendations);
-      console.log("✅ musicSentiments:", musicSentiments);
-    } catch (e) {
-      console.error("❌ Error in getMusicSentiments:", e);
-    }
-    
+    let newsSentiments = await getNewsSentiments();
+    let spotifyRecommendations = await getAllSpotifyRecommendations(3);
+    let musicSentiments = await getMusicSentiments(spotifyRecommendations);
 
     newsSentiments = sortObjectByNestedValue(newsSentiments, "sentiment");
     musicSentiments = sortObjectByNestedValue(musicSentiments, "sentiment");
