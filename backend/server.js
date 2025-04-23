@@ -252,14 +252,33 @@ app.get('/api/match-songs', async (req, res) => {
       return res.json(existingDoc.data().matches);
     }
 
-    let newsSentiments = await getNewsSentiments();
-    let spotifyRecommendations = await getAllSpotifyRecommendations(3);
-    let musicSentiments = await getMusicSentiments(spotifyRecommendations);
+    // let newsSentiments = await getNewsSentiments();
+    // let spotifyRecommendations = await getAllSpotifyRecommendations(3);
+    // let musicSentiments = await getMusicSentiments(spotifyRecommendations);
     
-    console.log("TESTING")
-    console.log("newsSentiments: ", newsSentiments)
-    console.log("spotifyRecommendations: ", spotifyRecommendations)
-    console.log("musicSentiments: ", musicSentiments)
+    let newsSentiments, spotifyRecommendations, musicSentiments;
+
+    try {
+      newsSentiments = await getNewsSentiments();
+      console.log("✅ newsSentiments:", newsSentiments);
+    } catch (e) {
+      console.error("❌ Error in getNewsSentiments:", e);
+    }
+    
+    try {
+      spotifyRecommendations = await getAllSpotifyRecommendations(3);
+      console.log("✅ spotifyRecommendations:", spotifyRecommendations);
+    } catch (e) {
+      console.error("❌ Error in getAllSpotifyRecommendations:", e);
+    }
+    
+    try {
+      musicSentiments = await getMusicSentiments(spotifyRecommendations);
+      console.log("✅ musicSentiments:", musicSentiments);
+    } catch (e) {
+      console.error("❌ Error in getMusicSentiments:", e);
+    }
+    
 
     newsSentiments = sortObjectByNestedValue(newsSentiments, "sentiment");
     musicSentiments = sortObjectByNestedValue(musicSentiments, "sentiment");
