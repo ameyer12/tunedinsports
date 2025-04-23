@@ -230,16 +230,16 @@ function generateSentimentMatches(obj1, obj2) {
   return matches;
 }
 
-async function getAllSpotifyRecommendations(batchCount = 3) {
-  const recommendationPromises = Array.from({ length: batchCount }, () =>
-    getSpotifyRecommendations()
-  );
+// async function getAllSpotifyRecommendations(batchCount = 3) {
+//   const recommendationPromises = Array.from({ length: batchCount }, () =>
+//     getSpotifyRecommendations()
+//   );
 
-  const allResponses = await Promise.all(recommendationPromises);
-  const allTracks = allResponses.flatMap(res => res.tracks);
+//   const allResponses = await Promise.all(recommendationPromises);
+//   const allTracks = allResponses.flatMap(res => res.tracks);
 
-  return { tracks: allTracks };
-}
+//   return { tracks: allTracks };
+// }
 
 app.get('/api/match-songs', async (req, res) => {
   console.log("🔍 /api/match-songs endpoint called");
@@ -264,7 +264,7 @@ app.get('/api/match-songs', async (req, res) => {
     }
 
     let newsSentiments = await getNewsSentiments();
-    let spotifyRecommendations = await getAllSpotifyRecommendations(3);
+    let spotifyRecommendations = await getSpotifyRecommendations();
     let musicSentiments = await getMusicSentiments(spotifyRecommendations);
 
     newsSentiments = sortObjectByNestedValue(newsSentiments, "sentiment");
