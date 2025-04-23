@@ -133,7 +133,6 @@ async function getMusicSentiments(recommendations) {
   const musicSentiments = {};
   const musicSentiment = new Sentiment();
 
-  // Parallel lyric sentiment analysis
   const musicSentimentPromises = recommendations.tracks.map(async (track) => {
     const title = track.name;
     const spotifyLink = track["external_urls"]["spotify"];
@@ -141,26 +140,26 @@ async function getMusicSentiments(recommendations) {
     try {
       const results = await Client.songs.search(title);
 
-      console.log("get music sentiments results: ", results);
-  
       if (results.length === 0) return;
 
       const lyrics = await results[0].lyrics();
       const sentiment = musicSentiment.analyze(lyrics);
 
       musicSentiments[title] = {
-        sentiment: sentiment.score, 
-        spotifyLink: spotifyLink
+        sentiment: sentiment.score,
+        spotifyLink
       };
     } catch (error) {
-      console.error(`Error for track ${title}:`, error.response?.data || error.message);
+      // Gracefully skip failed requests
+      console.error(`❌ Genius fetch failed for "${title}":`, error.message || error.response?.data);
     }
   });
 
-  await Promise.all(musicSentimentPromises);
+  await Promise.allSettled(musicSentimentPromises);
 
   return musicSentiments;
 }
+
 
 function sortObjectByValue(obj) {
   const entries = Object.entries(obj);
