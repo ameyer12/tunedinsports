@@ -226,7 +226,6 @@ function generateSentimentMatches(obj1, obj2) {
   return matches;
 }
 
-
 async function getAllSpotifyRecommendations(batchCount = 3) {
   const recommendationPromises = Array.from({ length: batchCount }, () =>
     getSpotifyRecommendations()
@@ -239,6 +238,8 @@ async function getAllSpotifyRecommendations(batchCount = 3) {
 }
 
 app.get('/api/match-songs', async (req, res) => {
+  console.log("🔍 /api/match-songs endpoint called");
+
   const today = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
   const docRef = db.collection('dailyMatches').doc(today);
 
