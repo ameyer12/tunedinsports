@@ -246,6 +246,8 @@ app.get('/api/match-songs', async (req, res) => {
   try {
     const existingDoc = await docRef.get();
 
+    console.log("🔍 /api/match-songs endpoint inside try")
+
     if (existingDoc.exists) {
       return res.json(existingDoc.data().matches);
     }
