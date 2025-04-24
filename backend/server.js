@@ -181,7 +181,7 @@ async function getMusicSentiments(recommendations) {
     const artist = track.artists[0].name;
     const spotifyLink = track["external_urls"]["spotify"];
 
-    const results = getLyricsFromGenius(track, artist);
+    const results = await getLyricsFromGenius(track, artist);
 
     // const sentiment = musicSentiment.analyze(lyrics);
     console.log("artist: ", artist, "title: ", title, "lyrics: ", results);
