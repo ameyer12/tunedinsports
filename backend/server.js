@@ -6,8 +6,6 @@ const Genius = require("genius-lyrics");
 const Client = new Genius.Client("OsFdWzPGj0TlUTFJi5M700irhs2xjEa6xN6TrXhfebjtmjjC3KZl27SsMDgz7zjz");
 const admin = require('firebase-admin');
 const qs = require('querystring'); 
-const dns = require('dns');
-dns.setDefaultResultOrder('ipv4first');
 
 // const config = require('../config');
 // const serviceAccount = require('./service-account-key.json');
@@ -141,7 +139,7 @@ async function getMusicSentiments(recommendations) {
     const spotifyLink = track["external_urls"]["spotify"];
 
     const results = await Client.songs.search(title);
-    const lyrics = await results[0].lyrics;
+    const lyrics = await results[0].lyrics();
     // const sentiment = musicSentiment.analyze(lyrics);
     console.log("title: ", title, "lyrics: ", lyrics);
   })
