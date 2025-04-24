@@ -3,12 +3,9 @@ const cors = require('cors');
 const axios = require('axios');
 const Sentiment = require('sentiment');
 const Genius = require("genius-lyrics");
-const Client = new Genius.Client("OsFdWzPGj0TlUTFJi5M700irhs2xjEa6xN6TrXhfebjtmjjC3KZl27SsMDgz7zjz");
+// const Client = new Genius.Client("OsFdWzPGj0TlUTFJi5M700irhs2xjEa6xN6TrXhfebjtmjjC3KZl27SsMDgz7zjz");
 const admin = require('firebase-admin');
 const qs = require('querystring'); 
-const dns = require('dns');
-dns.setDefaultResultOrder('ipv4first');
-
 // const config = require('../config');
 // const serviceAccount = require('./service-account-key.json');
 
@@ -132,18 +129,62 @@ async function getSpotifyRecommendations() {
   }
 }
 
+async function getLyricsFromGenius(title, artist) {
+  try {
+    const searchQuery = `${title} ${artist}`;
+    
+    // 1. Search Genius
+    const searchRes = await axios.get('https://genius-song-lyrics1.p.rapidapi.com/search/', {
+      params: { q: searchQuery },
+      headers: {
+        'x-rapidapi-key': RAPID_API_KEY,
+        'x-rapidapi-host': RAPID_API_HOST,
+      },
+    });
+
+    const hits = searchRes.data.hits;
+    if (!hits || hits.length === 0) {
+      console.warn(`❌ No Genius results for "${searchQuery}"`);
+      return null;
+    }
+
+    const geniusId = hits[0].result.id;
+
+    // 2. Fetch Lyrics by ID
+    const lyricsRes = await axios.get('https://genius-song-lyrics1.p.rapidapi.com/song/lyrics/', {
+      params: { id: geniusId },
+      headers: {
+        'x-rapidapi-key': RAPID_API_KEY,
+        'x-rapidapi-host': RAPID_API_HOST,
+      },
+    });
+
+    const lyrics = lyricsRes.data?.lyrics?.lyrics?.body?.plain;
+    if (!lyrics) {
+      console.warn(`⚠️ Lyrics not found for Genius ID: ${geniusId}`);
+      return null;
+    }
+
+    return lyrics;
+  } catch (err) {
+    console.error(`❌ Genius API failed for "${title}" by "${artist}":`, err.message);
+    return null;
+  }
+}
+
 async function getMusicSentiments(recommendations) {
   const musicSentiments = {};
   const musicSentiment = new Sentiment();
 
   const musicSentimentPromises = recommendations.tracks.map(async (track) => {
     const title = track.name;
+    const artist = track.artist;
     const spotifyLink = track["external_urls"]["spotify"];
 
-    const results = await Client.songs.search(title);
-    const lyrics = await results[0].lyrics();
+    const results = getLyricsFromGenius(track, artist);
+
     // const sentiment = musicSentiment.analyze(lyrics);
-    console.log("title: ", title, "lyrics: ", lyrics);
+    console.log("track: ", track, "title: ", title, "lyrics: ", results);
   })
 
   //   try {
