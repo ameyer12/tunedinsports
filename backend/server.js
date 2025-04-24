@@ -139,7 +139,7 @@ async function getMusicSentiments(recommendations) {
 
     const results = await Client.songs.search(title);
     console.log("title: ", title, "results: ", results);
-  }
+  })
 
   //   try {
   //     const results = await Client.songs.search(title);
