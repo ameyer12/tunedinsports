@@ -138,7 +138,7 @@ async function getMusicSentiments(recommendations) {
     const spotifyLink = track["external_urls"]["spotify"];
 
     const results = await Client.songs.search(title);
-    console.log("title: ", title, "results: ", results);
+    console.log("title: ", title, "results: ", results[0].lyrics);
   })
 
   //   try {
