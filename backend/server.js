@@ -172,48 +172,67 @@ async function getLyricsFromGenius(title, artist) {
   }
 }
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function getMusicSentiments(recommendations) {
   const musicSentiments = {};
   const musicSentiment = new Sentiment();
 
-  const musicSentimentPromises = recommendations.tracks.map(async (track) => {
+  for (const track of recommendations.tracks) {
     const title = track.name;
-    const artist = track.artists[0].name;
-    const spotifyLink = track["external_urls"]["spotify"];
+    const artist = track.artists?.[0]?.name || "Unknown";
+    const spotifyLink = track.external_urls.spotify;
 
-    const results = await getLyricsFromGenius(track, artist);
+    try {
+      // Add a delay to avoid rate limiting (200ms = max 5 req/sec)
+      await delay(250); 
 
-    // const sentiment = musicSentiment.analyze(lyrics);
-    console.log("artist: ", artist, "title: ", title, "lyrics: ", results);
-  })
+      const searchRes = await axios.get("https://genius-song-lyrics1.p.rapidapi.com/search/", {
+        params: { q: `${title} ${artist}` },
+        headers: {
+          'x-rapidapi-key': process.env.RAPID_API_KEY,
+          'x-rapidapi-host': 'genius-song-lyrics1.p.rapidapi.com'
+        }
+      });
 
-  //   try {
-  //     const results = await Client.songs.search(title);
-  //     console.log(`🔍 Genius results for "${title}":`, results?.[0]?.fullTitle);
+      const songId = searchRes.data?.hits?.[0]?.result?.id;
+      if (!songId) {
+        console.warn(`⚠️ No Genius result found for "${title}" by "${artist}"`);
+        continue;
+      }
 
-  //     if (!results.length) {
-  //       console.warn(`⚠️ No Genius results for "${title}"`);
-  //       return;
-  //     }
+      const lyricsRes = await axios.get("https://genius-song-lyrics1.p.rapidapi.com/song/lyrics/", {
+        params: { id: songId },
+        headers: {
+          'x-rapidapi-key': process.env.RAPID_API_KEY,
+          'x-rapidapi-host': 'genius-song-lyrics1.p.rapidapi.com'
+        }
+      });
 
-  //     const lyrics = await results[0].lyrics();
-  //     const sentiment = musicSentiment.analyze(lyrics);
+      const lyrics = lyricsRes.data?.lyrics?.lyrics?.body?.plain;
+      if (!lyrics) {
+        console.warn(`⚠️ No lyrics found for "${title}"`);
+        continue;
+      }
 
-  //     musicSentiments[title] = {
-  //       sentiment: sentiment.score,
-  //       spotifyLink
-  //     };
+      const sentiment = musicSentiment.analyze(lyrics);
 
-  //     console.log(`✅ Sentiment stored for "${title}":`, sentiment.score);
-  //   } catch (error) {
-  //     console.error(`❌ Genius fetch failed for "${title}":`, error.response?.data || error.message);
-  //   }
-  // });
+      musicSentiments[title] = {
+        sentiment: sentiment.score,
+        spotifyLink
+      };
 
-  // await Promise.allSettled(musicSentimentPromises);
+      console.log(`✅ "${title}" sentiment:`, sentiment.score);
+    } catch (err) {
+      console.error(`❌ Genius API failed for "${title}" by "${artist}":`, err.message);
+    }
+  }
 
   return musicSentiments;
 }
+
 
 function sortObjectByValue(obj) {
   const entries = Object.entries(obj);
