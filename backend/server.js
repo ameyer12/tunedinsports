@@ -154,8 +154,8 @@ async function getLyricsFromGenius(title, artist) {
     const lyricsRes = await axios.get('https://genius-song-lyrics1.p.rapidapi.com/song/lyrics/', {
       params: { id: geniusId },
       headers: {
-        'x-rapidapi-key': RAPID_API_KEY,
-        'x-rapidapi-host': RAPID_API_HOST,
+        'x-rapidapi-key': process.env.RAPID_API_KEY,
+        'x-rapidapi-host': 'genius-song-lyrics1.p.rapidapi.com',
       },
     });
 
