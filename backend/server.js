@@ -137,8 +137,8 @@ async function getLyricsFromGenius(title, artist) {
     const searchRes = await axios.get('https://genius-song-lyrics1.p.rapidapi.com/search/', {
       params: { q: searchQuery },
       headers: {
-        'x-rapidapi-key': RAPID_API_KEY,
-        'x-rapidapi-host': RAPID_API_HOST,
+        'x-rapidapi-key': process.env.RAPID_API_KEY,
+        'x-rapidapi-host': 'genius-song-lyrics1.p.rapidapi.com',
       },
     });
 
@@ -178,7 +178,7 @@ async function getMusicSentiments(recommendations) {
 
   const musicSentimentPromises = recommendations.tracks.map(async (track) => {
     const title = track.name;
-    const artist = track.artists;
+    const artist = track.artists[0].name;
     const spotifyLink = track["external_urls"]["spotify"];
 
     const results = getLyricsFromGenius(track, artist);
