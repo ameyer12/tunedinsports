@@ -139,8 +139,8 @@ async function getMusicSentiments(recommendations) {
 
     const results = await Client.songs.search(title);
     const lyrics = await results[0].lyrics();
-    const sentiment = musicSentiment.analyze(lyrics);
-    console.log("title: ", title, "lyrics: ", lyrics, "sentiment: ", sentiment);
+    // const sentiment = musicSentiment.analyze(lyrics);
+    console.log("title: ", title, "lyrics: ", lyrics);
   })
 
   //   try {
