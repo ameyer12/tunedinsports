@@ -186,34 +186,12 @@ async function getMusicSentiments(recommendations) {
     const spotifyLink = track.external_urls.spotify;
 
     try {
-      // Add a delay to avoid rate limiting (200ms = max 5 req/sec)
-      await delay(250); 
+      await delay(250); // Rate limit compliance
 
-      const searchRes = await axios.get("https://genius-song-lyrics1.p.rapidapi.com/search/", {
-        params: { q: `${title} ${artist}` },
-        headers: {
-          'x-rapidapi-key': process.env.RAPID_API_KEY,
-          'x-rapidapi-host': 'genius-song-lyrics1.p.rapidapi.com'
-        }
-      });
+      const lyrics = await getLyricsFromGenius(title, artist);
 
-      const songId = searchRes.data?.hits?.[0]?.result?.id;
-      if (!songId) {
-        console.warn(`⚠️ No Genius result found for "${title}" by "${artist}"`);
-        continue;
-      }
-
-      const lyricsRes = await axios.get("https://genius-song-lyrics1.p.rapidapi.com/song/lyrics/", {
-        params: { id: songId },
-        headers: {
-          'x-rapidapi-key': process.env.RAPID_API_KEY,
-          'x-rapidapi-host': 'genius-song-lyrics1.p.rapidapi.com'
-        }
-      });
-
-      const lyrics = lyricsRes.data?.lyrics?.lyrics?.body?.plain;
       if (!lyrics) {
-        console.warn(`⚠️ No lyrics found for "${title}"`);
+        console.warn(`⚠️ No lyrics found for "${title}" by "${artist}"`);
         continue;
       }
 
@@ -226,13 +204,12 @@ async function getMusicSentiments(recommendations) {
 
       console.log(`✅ "${title}" sentiment:`, sentiment.score);
     } catch (err) {
-      console.error(`❌ Genius API failed for "${title}" by "${artist}":`, err.message);
+      console.error(`❌ Sentiment fetch failed for "${title}" by "${artist}":`, err.message);
     }
   }
 
   return musicSentiments;
 }
-
 
 function sortObjectByValue(obj) {
   const entries = Object.entries(obj);
