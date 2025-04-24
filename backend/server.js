@@ -133,7 +133,7 @@ async function getLyricsFromGenius(title, artist) {
   try {
     const searchQuery = `${title} ${artist}`;
     
-    // 1. Search Genius
+    // Step 1: Search Genius
     const searchRes = await axios.get('https://genius-song-lyrics1.p.rapidapi.com/search/', {
       params: { q: searchQuery },
       headers: {
@@ -142,15 +142,19 @@ async function getLyricsFromGenius(title, artist) {
       },
     });
 
-    const hits = searchRes.data.hits;
+    const hits = searchRes.data?.hits;
     if (!hits || hits.length === 0) {
       console.warn(`❌ No Genius results for "${searchQuery}"`);
       return null;
     }
 
-    const geniusId = hits[0].result.id;
+    const topResult = hits[0]?.result;
+    const geniusId = topResult?.id;
+    const matchedTitle = topResult?.full_title || "[Unknown]";
 
-    // 2. Fetch Lyrics by ID
+    console.log(`🔍 Genius matched title for "${title}": ${matchedTitle}`);
+
+    // Step 2: Fetch Lyrics
     const lyricsRes = await axios.get('https://genius-song-lyrics1.p.rapidapi.com/song/lyrics/', {
       params: { id: geniusId },
       headers: {
@@ -159,10 +163,13 @@ async function getLyricsFromGenius(title, artist) {
       },
     });
 
-    console.log(`📦 Raw lyrics response for "${title}":`, JSON.stringify(lyricsRes.data, null, 2));
-    const lyrics = lyricsRes.data?.lyrics?.lyrics?.body?.plain;
+    const lyrics =
+      lyricsRes.data?.lyrics?.body?.plain ||
+      lyricsRes.data?.lyrics?.lyrics?.body?.plain ||
+      null;
+
     if (!lyrics) {
-      console.warn(`⚠️ Lyrics not found for Genius ID: ${geniusId}`);
+      console.warn(`⚠️ No lyrics found for Genius ID: ${geniusId}`);
       return null;
     }
 
@@ -173,13 +180,14 @@ async function getLyricsFromGenius(title, artist) {
   }
 }
 
+
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function getMusicSentiments(recommendations) {
   const musicSentiments = {};
-  const musicSentiment = new Sentiment();
+  const sentiment = new Sentiment();
 
   for (const track of recommendations.tracks) {
     const title = track.name;
@@ -187,25 +195,25 @@ async function getMusicSentiments(recommendations) {
     const spotifyLink = track.external_urls.spotify;
 
     try {
-      await delay(250); // Rate limit compliance
+      await delay(250); // Genius rate limit: 5 req/sec
 
       const lyrics = await getLyricsFromGenius(title, artist);
 
       if (!lyrics) {
-        console.warn(`⚠️ No lyrics found for "${title}" by "${artist}"`);
+        console.warn(`⚠️ Skipping: No lyrics found for "${title}" by "${artist}"`);
         continue;
       }
 
-      const sentiment = musicSentiment.analyze(lyrics);
+      const score = sentiment.analyze(lyrics).score;
 
       musicSentiments[title] = {
-        sentiment: sentiment.score,
-        spotifyLink
+        sentiment: score,
+        spotifyLink,
       };
 
-      console.log(`✅ "${title}" sentiment:`, sentiment.score);
+      console.log(`✅ "${title}" sentiment score: ${score}`);
     } catch (err) {
-      console.error(`❌ Sentiment fetch failed for "${title}" by "${artist}":`, err.message);
+      console.error(`❌ Failed to process "${title}" by "${artist}":`, err.message);
     }
   }
 
