@@ -159,6 +159,7 @@ async function getLyricsFromGenius(title, artist) {
       },
     });
 
+    console.log(`📦 Raw lyrics response for "${title}":`, JSON.stringify(lyricsRes.data, null, 2));
     const lyrics = lyricsRes.data?.lyrics?.lyrics?.body?.plain;
     if (!lyrics) {
       console.warn(`⚠️ Lyrics not found for Genius ID: ${geniusId}`);
