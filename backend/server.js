@@ -6,6 +6,8 @@ const Genius = require("genius-lyrics");
 const Client = new Genius.Client("OsFdWzPGj0TlUTFJi5M700irhs2xjEa6xN6TrXhfebjtmjjC3KZl27SsMDgz7zjz");
 const admin = require('firebase-admin');
 const qs = require('querystring'); 
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
 
 // const config = require('../config');
 // const serviceAccount = require('./service-account-key.json');
