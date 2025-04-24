@@ -137,30 +137,34 @@ async function getMusicSentiments(recommendations) {
     const title = track.name;
     const spotifyLink = track["external_urls"]["spotify"];
 
-    try {
-      const results = await Client.songs.search(title);
-      console.log(`🔍 Genius results for "${title}":`, results?.[0]?.fullTitle);
+    const results = await Client.songs.search(title);
+    console.log("title: ", title, "results: ", results);
+  }
 
-      if (!results.length) {
-        console.warn(`⚠️ No Genius results for "${title}"`);
-        return;
-      }
+  //   try {
+  //     const results = await Client.songs.search(title);
+  //     console.log(`🔍 Genius results for "${title}":`, results?.[0]?.fullTitle);
 
-      const lyrics = await results[0].lyrics();
-      const sentiment = musicSentiment.analyze(lyrics);
+  //     if (!results.length) {
+  //       console.warn(`⚠️ No Genius results for "${title}"`);
+  //       return;
+  //     }
 
-      musicSentiments[title] = {
-        sentiment: sentiment.score,
-        spotifyLink
-      };
+  //     const lyrics = await results[0].lyrics();
+  //     const sentiment = musicSentiment.analyze(lyrics);
 
-      console.log(`✅ Sentiment stored for "${title}":`, sentiment.score);
-    } catch (error) {
-      console.error(`❌ Genius fetch failed for "${title}":`, error.response?.data || error.message);
-    }
-  });
+  //     musicSentiments[title] = {
+  //       sentiment: sentiment.score,
+  //       spotifyLink
+  //     };
 
-  await Promise.allSettled(musicSentimentPromises);
+  //     console.log(`✅ Sentiment stored for "${title}":`, sentiment.score);
+  //   } catch (error) {
+  //     console.error(`❌ Genius fetch failed for "${title}":`, error.response?.data || error.message);
+  //   }
+  // });
+
+  // await Promise.allSettled(musicSentimentPromises);
 
   return musicSentiments;
 }
