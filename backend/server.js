@@ -163,7 +163,12 @@ async function getLyricsFromGenius(title, artist) {
       },
     });
 
-    console.log("LYRICS: ", lyricsRes.data.lyrics.lyrics)
+    const lyricsHtml = lyricsRes.data?.lyrics?.lyrics?.html;
+    const lyrics = lyricsHtml
+      ? lyricsHtml.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+      : null;
+
+    console.log("LYRICS: ", lyrics)
 
     // const lyrics =
     //   lyricsRes.data?.lyrics?.body?.plain ||
