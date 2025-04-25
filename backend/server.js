@@ -163,10 +163,12 @@ async function getLyricsFromGenius(title, artist) {
       },
     });
 
-    const lyrics =
-      lyricsRes.data?.lyrics?.body?.plain ||
-      lyricsRes.data?.lyrics?.lyrics?.body?.plain ||
-      null;
+    console.log("lyrics: ", lyricsRes)
+
+    // const lyrics =
+    //   lyricsRes.data?.lyrics?.body?.plain ||
+    //   lyricsRes.data?.lyrics?.lyrics?.body?.plain ||
+    //   null;
 
     if (!lyrics) {
       console.warn(`⚠️ No lyrics found for Genius ID: ${geniusId}`);
