@@ -296,13 +296,20 @@ function generateSentimentMatches(obj1, obj2) {
 }
 
 async function getAllSpotifyRecommendations(batchCount = 3) {
-  const recommendationPromises = Array.from({ length: batchCount }, () =>
-    getSpotifyRecommendations()
-  );
+  const results = [];
 
-  const allResponses = await Promise.all(recommendationPromises);
-  const allTracks = allResponses.flatMap(res => res.tracks);
+  for (let i = 0; i < batchCount; i++) {
+    try {
+      const res = await getSpotifyRecommendations();
+      results.push(res);
+      await delay(250); // Wait 250ms between requests to stay under 5 req/sec
+    } catch (err) {
+      console.error(`Spotify request ${i + 1} failed:`, err.message);
+      // Optional: add retry logic here if needed
+    }
+  }
 
+  const allTracks = results.flatMap(res => res.tracks);
   return { tracks: allTracks };
 }
 
