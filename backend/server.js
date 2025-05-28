@@ -9,6 +9,9 @@ const qs = require('querystring');
 // const config = require('../config');
 // const serviceAccount = require('./service-account-key.json');
 
+require('dotenv').config();
+
+
 const serviceAccount = JSON.parse(
   Buffer.from(process.env.FIREBASE_SERVICE_KEY, 'base64').toString('utf8')
 );
