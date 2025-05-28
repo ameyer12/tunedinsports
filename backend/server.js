@@ -104,13 +104,18 @@ async function getSpotifyRecommendations() {
     "3Rc2ajBMInxeNGVkMPC92Y", "2MvvoeRt8NcOXWESkxWn3g", "2pxCOdnHEZZ3A1XRNxjc1v", "2LMkwUfqC6S6s6qDVlEuzV", "1fDFHXcykq4iw8Gg7s5hG9"
   ];
   
-  const seedGenres = genrePool.sort(() => 0.5 - Math.random()).slice(0, 2).join(',');
-  const seedArtists = artistPool.sort(() => 0.5 - Math.random()).slice(0, 2).join(',');
-  const seedTracks = trackPool[Math.floor(Math.random() * trackPool.length)];
+  // const seedGenres = genrePool.sort(() => 0.5 - Math.random()).slice(0, 2).join(',');
+  // const seedArtists = artistPool.sort(() => 0.5 - Math.random()).slice(0, 2).join(',');
+  // const seedTracks = trackPool[Math.floor(Math.random() * trackPool.length)];
+
+  const seedGenres = 'pop,rock';
+  const seedArtists = '1Xyo4u8uXC1ZmMpatF05PJ'; // The Weeknd
+  const seedTracks = '4iG2gAwKXsOcijVaVXzRPW'; // Popular track
+
 
   const options = {
     method: 'GET',
-    url: 'https://spotify23.p.rapidapi.com/recommendations/',
+    url: 'https://spotify23.p.rapidapi.com/recommendations',
     params: {
       limit: '100',
       seed_tracks: seedTracks,
